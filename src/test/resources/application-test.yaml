@@ -1,0 +1,18 @@
+spring:
+  cloud:
+    gcp:
+      core:
+        enabled: ${GCP_PUB_SUB_ENABLED:false}
+      pubsub:
+        enabled: ${GCP_PUB_SUB_ENABLED:false}
+      project-id: ${GCP_PROJECT_ID:""}
+      credentials:
+        location: file:${GCP_CREDENTIALS_FILE_LOCATION:""}
+
+publisher:
+  topic:
+    name: ${TOPIC_TO_PUBLISH:""}
+
+consumer:
+  topic:
+    subscriptionId: ${TOPIC_SUBSCRIPTION_ID:""}
