@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:33106/crater_atomfeed?characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=True
+    username: crater_atomfeed_user
+    password: passw0rd
+  jpa:
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+server:
+  port: 9200
+bahmni:
+  feed:
+    connectionTimeoutInMilliseconds: 10000
+    replyTimeoutInMilliseconds: 20000
+    maxFailedEvents: 10000
+    failedEventMaxRetry: 10
+  openmrs:
+    host: localhost
+    port: 8080
+    authority: http://${bahmni.openmrs.host}:${bahmni.openmrs.port}
+    authUri: ${bahmni.openmrs.authority}/openmrs/ws/rest/v1/session
+    patientFeedUri: ${bahmni.openmrs.authority}/openmrs/ws/atomfeed/patient/recent
+    user: admin
+    password: Admin123
+    connectionTimeoutInMilliseconds: 10000
+    replyTimeoutInMilliseconds: 20000
+logging:
+  level.org.ict4h.atomfeed.client.repository.jdbc: ERROR
