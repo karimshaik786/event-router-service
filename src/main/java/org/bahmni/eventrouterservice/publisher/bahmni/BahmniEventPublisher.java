@@ -28,7 +28,7 @@ public class BahmniEventPublisher {
                 throw new FailedToPublishException(url);
             }
         } catch (RuntimeException exception) {
-            logger.error("Failed to publish the payload : "+payload+" on url : "+url);
+            logger.error("Failed to publish the payload on url : "+url);
             throw new FailedToPublishException(url, exception);
         }
     }
