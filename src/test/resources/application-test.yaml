@@ -9,10 +9,6 @@ spring:
       credentials:
         location: file:${GCP_CREDENTIALS_FILE_LOCATION:""}
 
-publisher:
-  topic:
-    name: ${TOPIC_TO_PUBLISH:""}
-
-consumer:
-  topic:
-    subscriptionId: ${TOPIC_SUBSCRIPTION_ID:""}
+publisher-config-file: ${PUBLISHER_CONFIG_FILE_LOCATION:""}
+subscriber-config-file: ${SUBSCRIBER_CONFIG_FILE_LOCATION:""}
+subscriber-schedule-configuration-file: ${SUBSCRIBER_SCHEDULE_CONFIGURATION_FILE_LOCATION:""}

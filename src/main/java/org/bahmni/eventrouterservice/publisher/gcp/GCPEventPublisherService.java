@@ -1,7 +1,11 @@
-package org.bahmni.eventrouterservice.publisher;
+package org.bahmni.eventrouterservice.publisher.gcp;
 
-import org.bahmni.eventrouterservice.Topic;
+import org.bahmni.eventrouterservice.configuration.Topic;
+import org.bahmni.eventrouterservice.publisher.bahmni.BahmniEventPublisherService;
+import org.bahmni.eventrouterservice.publisher.common.service.EventPublisherService;
 import org.bahmni.eventrouterservice.publisher.configuration.PublisherConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -12,6 +16,7 @@ import org.springframework.stereotype.Component;
 )
 @Component
 public class GCPEventPublisherService implements EventPublisherService {
+    Logger logger = LoggerFactory.getLogger(GCPEventPublisherService.class);
     private final GCPEventPublisher eventPublisher;
     private final PublisherConfiguration publisherConfiguration;
 
@@ -23,7 +28,8 @@ public class GCPEventPublisherService implements EventPublisherService {
 
     @Override
     public void publish(String payload, String publisherId) {
-        Topic topic = publisherConfiguration.getTopicFor(publisherId).get();
+        Topic topic = publisherConfiguration.getTopicFor(publisherId);
         eventPublisher.publish(topic.getName(), payload);
+        logger.debug("Successfully publish the message on topic :" + topic.getName() + " with payload " + payload);
     }
 }

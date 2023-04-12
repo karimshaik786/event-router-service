@@ -1,59 +1,64 @@
 package org.bahmni.eventrouterservice.publisher.configuration;
 
-import org.bahmni.eventrouterservice.ServiceName;
-import org.bahmni.eventrouterservice.Topic;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.bahmni.eventrouterservice.configuration.ServiceName;
+import org.bahmni.eventrouterservice.configuration.Topic;
+import org.bahmni.eventrouterservice.exception.FailedToLoadConfiguration;
+import org.bahmni.eventrouterservice.publisher.common.exception.EndpointNotConfiguredForPublisherException;
+import org.bahmni.eventrouterservice.publisher.common.exception.TopicNotConfiguredForPublisherException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class PublisherConfiguration {
 
-    private List<PublisherDescription> publisherDescriptions;
-    private final String publisherConfigFile;
-    private final ObjectMapper objectMapper;
+    Logger logger = LoggerFactory.getLogger(PublisherConfiguration.class);
 
-    public PublisherConfiguration(@Value("${publisher-config-file}") String publisherConfigFile, ObjectMapper objectMapper) {
-        this.publisherConfigFile = publisherConfigFile;
-        this.objectMapper = objectMapper;
+    private List<PublisherDescription> publisherDescriptions;
+
+    public PublisherConfiguration(@Value("${publisher-configuration-file}") String publisherConfigFile, ObjectMapper objectMapper) {
+        loadDescription(publisherConfigFile, objectMapper);
     }
 
-    @PostConstruct
-    private void loadConfig() {
+    private void loadDescription(String publisherConfigurationFile, ObjectMapper objectMapper) {
         try {
-            File configFile = new FileSystemResource(publisherConfigFile).getFile();
-            this.publisherDescriptions = objectMapper.readValue(configFile, new TypeReference<List<PublisherDescription>>() {});
+            File configFile = new FileSystemResource(publisherConfigurationFile).getFile();
+            this.publisherDescriptions = objectMapper.readValue(configFile, new TypeReference<>() {});
 
-        } catch (IOException e) {
-            throw new RuntimeException("Error in loading config "+e.getMessage());
+        } catch (IOException exception) {
+            logger.error("Failed to load configuration for file : " + publisherConfigurationFile);
+            throw new FailedToLoadConfiguration(publisherConfigurationFile, exception);
         }
     }
 
     public List<PublisherDescription> getPublisherDescriptions() {
-        return this.publisherDescriptions;
+        return Collections.unmodifiableList(this.publisherDescriptions);
     }
 
-    public Optional<String> getEndpointFor(String publisherId) {
+    public String getEndpointFor(String publisherId) {
         return this.publisherDescriptions.stream()
                 .filter(publisherDescription -> publisherDescription.getId().equals(publisherId))
                 .findFirst()
-                .map(PublisherDescription::getEndpoint);
+                .map(PublisherDescription::getEndpoint)
+                .orElseThrow(() -> new EndpointNotConfiguredForPublisherException(publisherId));
     }
 
-    public Optional<Topic> getTopicFor(String publisherId) {
+    public Topic getTopicFor(String publisherId) {
         return this.publisherDescriptions.stream()
                 .filter(publisherDescription -> publisherDescription.getId().equals(publisherId))
                 .findFirst()
-                .map(PublisherDescription::getTopic);
+                .map(PublisherDescription::getTopic)
+                .orElseThrow(() -> new TopicNotConfiguredForPublisherException(publisherId));
     }
 
     @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
@@ -67,7 +72,7 @@ public class PublisherConfiguration {
             return id;
         }
 
-        public ServiceName getServiceNameToPublish() {
+        public ServiceName getServiceName() {
             return destination.serviceName;
         }
 
@@ -82,7 +87,7 @@ public class PublisherConfiguration {
 
     @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
     // TODO: TopicBasedDestination and URLBasedDestination
-    public static class Destination {
+    static class Destination {
         private ServiceName serviceName;
         private String endpoint;
         private Topic topic;

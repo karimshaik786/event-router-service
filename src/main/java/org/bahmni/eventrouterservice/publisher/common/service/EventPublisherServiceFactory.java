@@ -1,11 +1,13 @@
-package org.bahmni.eventrouterservice.publisher;
+package org.bahmni.eventrouterservice.publisher.common.service;
 
+import org.bahmni.eventrouterservice.publisher.bahmni.BahmniEventPublisherService;
+import org.bahmni.eventrouterservice.publisher.common.exception.PublisherNotConfiguredException;
 import org.bahmni.eventrouterservice.publisher.configuration.PublisherConfiguration;
+import org.bahmni.eventrouterservice.publisher.gcp.GCPEventPublisherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,28 +22,23 @@ public class EventPublisherServiceFactory {
     public EventPublisherServiceFactory(PublisherConfiguration publisherConfiguration, ApplicationContext applicationContext) {
         this.publisherConfiguration = publisherConfiguration;
         this.applicationContext = applicationContext;
+        initializedPublishers();
     }
 
-    @PostConstruct
     private void initializedPublishers() {
         publisherConfiguration.getPublisherDescriptions().forEach(publisherDescription -> {
-
-            switch (publisherDescription.getServiceNameToPublish()) {
-                case BAHMNI:
-                    publisherIdToPublisherService.put(publisherDescription.getId(),
-                            applicationContext.getBean(BahmniEventPublisherService.class));
-                    break;
-                case GCP:
-                    publisherIdToPublisherService.put(publisherDescription.getId(),
-                            applicationContext.getBean(GCPEventPublisherService.class));
-                    break;
-                default:
-                    throw new PublisherNotSupportedException(publisherDescription.getServiceNameToPublish());
+            switch (publisherDescription.getServiceName()) {
+                case BAHMNI -> publisherIdToPublisherService.put(publisherDescription.getId(),
+                        applicationContext.getBean(BahmniEventPublisherService.class));
+                case GCP -> publisherIdToPublisherService.put(publisherDescription.getId(),
+                        applicationContext.getBean(GCPEventPublisherService.class));
             }
         });
     }
 
-    public EventPublisherService getPublisherById(String publisherId) {
+    public EventPublisherService getById(String publisherId) {
+        if(!publisherIdToPublisherService.containsKey(publisherId))
+            throw new PublisherNotConfiguredException(publisherId);
         return publisherIdToPublisherService.get(publisherId);
     }
 }
