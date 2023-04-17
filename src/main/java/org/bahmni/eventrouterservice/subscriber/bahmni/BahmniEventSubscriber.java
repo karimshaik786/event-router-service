@@ -2,6 +2,7 @@ package org.bahmni.eventrouterservice.subscriber.bahmni;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.bahmni.eventrouterservice.atomfeed.jobs.FeedProcessor;
 import org.bahmni.eventrouterservice.configuration.ServiceName;
 import org.bahmni.eventrouterservice.publisher.common.service.EventPublisherService;
 import org.bahmni.eventrouterservice.publisher.common.service.EventPublisherServiceFactory;
@@ -26,6 +27,8 @@ public class BahmniEventSubscriber implements Runnable {
         private final RestTemplate restTemplate;
 
         private final ObjectMapper objectMapper;
+        private final FeedProcessor feedProcessor;
+
 
     @Autowired
     public BahmniEventSubscriber(SubscriberConfiguration subscriberConfiguration,
@@ -43,17 +46,17 @@ public class BahmniEventSubscriber implements Runnable {
         try {
             logger.info("Bhamni Subscriber job started...");
 
-            List<SubscriberDescription> subscriberDescriptions = subscriberConfiguration
-                    .getSubscribersAsPerOrderOfSubscriptionFor(ServiceName.BAHMNI);
-            for(SubscriberDescription subscriber: subscriberDescriptions) {
-
-                List records = restTemplate.getForObject(subscriber.getEndpoint(), List.class);
-                logger.info("Total records consumed : "+ records.size()+" from url : "+subscriber.getEndpoint());
-                if(!records.isEmpty())
-                    publish(records, subscriber);
-                logger.info("Total records published : "+ records.size()+" fetched from url : "+subscriber.getEndpoint());
-            }
-
+//            List<SubscriberDescription> subscriberDescriptions = subscriberConfiguration
+//                    .getSubscribersAsPerOrderOfSubscriptionFor(ServiceName.BAHMNI);
+//            for(SubscriberDescription subscriber: subscriberDescriptions) {
+//
+//                List records = restTemplate.getForObject(subscriber.getEndpoint(), List.class);
+//                logger.info("Total records consumed : "+ records.size()+" from url : "+subscriber.getEndpoint());
+//                if(!records.isEmpty())
+//                    publish(records, subscriber);
+//                logger.info("Total records published : "+ records.size()+" fetched from url : "+subscriber.getEndpoint());
+//            }
+            feedProcessor.processPatientFeed();
             logger.info("Bhamni Subscriber Job Finished.");
         } catch (Exception exception) {
             logger.error("Bhamni Subscriber Job Termination with cause : " + exception.getMessage());
