@@ -1,6 +1,5 @@
 package org.bahmni.eventrouterservice.subscriber.bahmni;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bahmni.eventrouterservice.publisher.common.exception.PublisherNotConfiguredException;
@@ -8,22 +7,25 @@ import org.bahmni.eventrouterservice.publisher.common.service.EventPublisherServ
 import org.bahmni.eventrouterservice.publisher.gcp.GCPEventPublisherService;
 import org.bahmni.eventrouterservice.subscriber.common.exception.FailedToSubscribeException;
 import org.bahmni.eventrouterservice.subscriber.configuration.SubscriberConfiguration;
+import org.bahmni.webclients.HttpClient;
+import org.ict4h.atomfeed.client.domain.Event;
+import org.ict4h.atomfeed.client.service.FeedClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 
 import static org.bahmni.eventrouterservice.configuration.ServiceName.BAHMNI;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class BahmniEventSubscriberTest {
@@ -33,12 +35,16 @@ class BahmniEventSubscriberTest {
     @Mock
     private EventPublisherServiceFactory eventPublisherServiceFactory;
     @Mock
-    private RestTemplate restTemplate;
+    private HttpClient bahmniHttpClient;
+    @Mock
+    private AtomFeedClientProperties feedProperties;
+    @Mock
+    private AtomFeedClientFactory atomFeedClientFactory;
     private BahmniEventSubscriber bahmniEventSubscriber;
 
     @BeforeEach
     public void setup() {
-        bahmniEventSubscriber = new BahmniEventSubscriber(subscriberConfiguration, eventPublisherServiceFactory, restTemplate, new ObjectMapper());
+        bahmniEventSubscriber = new BahmniEventSubscriber(subscriberConfiguration, eventPublisherServiceFactory, bahmniHttpClient, feedProperties, atomFeedClientFactory);
     }
 
     @Test
@@ -50,22 +56,13 @@ class BahmniEventSubscriberTest {
         Mockito.verify(subscriberConfiguration, Mockito.times(1)).getSubscribersAsPerOrderOfSubscriptionFor(BAHMNI);
     }
 
-    @Test
-    public void givenScheduledOfSubscribing_whenSubscribing_thenSuccessfullyFetchRecordsForEachSubscription() {
-        Mockito.when(subscriberConfiguration.getSubscribersAsPerOrderOfSubscriptionFor(BAHMNI)).thenReturn(defaultDescriptions());
-        Mockito.when(restTemplate.getForObject("https://gorest.co.in/public/v2/users",  List.class)).thenReturn(Collections.emptyList());
-
-        bahmniEventSubscriber.run();
-
-        Mockito.verify(restTemplate, Mockito.times(1)).getForObject("https://gorest.co.in/public/v2/users", List.class);
-    }
 
     @Test
     public void givenScheduledOfSubscribing_whenSubscribing_thenSuccessfullyGetThePublisherToPublishEvents() {
         Mockito.when(subscriberConfiguration.getSubscribersAsPerOrderOfSubscriptionFor(BAHMNI)).thenReturn(defaultDescriptions());
         Mockito.when(eventPublisherServiceFactory.getById("gcp-patient-registration"))
                 .thenReturn(mock(GCPEventPublisherService.class));
-        Mockito.when(restTemplate.getForObject("https://gorest.co.in/public/v2/users",  List.class)).thenReturn(defaultResponse());
+        Mockito.when(atomFeedClientFactory.get(any(), any())).thenReturn(mock(FeedClient.class));
 
         bahmniEventSubscriber.run();
 
@@ -73,47 +70,66 @@ class BahmniEventSubscriberTest {
     }
 
     @Test
-    public void givenScheduledOfSubscribing_whenSubscribing_thenSuccessfullyPublishEvents() {
+    public void givenScheduledOfSubscribing_whenSubscribing_thenSuccessfullyInvokeProcessEvents() {
         Mockito.when(subscriberConfiguration.getSubscribersAsPerOrderOfSubscriptionFor(BAHMNI)).thenReturn(defaultDescriptions());
-        GCPEventPublisherService publisherService = mock(GCPEventPublisherService.class);
         Mockito.when(eventPublisherServiceFactory.getById("gcp-patient-registration"))
-                .thenReturn(publisherService);
-        Mockito.when(restTemplate.getForObject("https://gorest.co.in/public/v2/users",  List.class)).thenReturn(defaultResponse());
+                .thenReturn(mock(GCPEventPublisherService.class));
+        FeedClient feedClient = mock(FeedClient.class);
+        Mockito.when(atomFeedClientFactory.get(any(), any())).thenReturn(feedClient);
 
         bahmniEventSubscriber.run();
 
-        String payload = "{\"id\":904244,\"name\":\"Dwaipayan Johar\",\"email\":\"dwaipayan_johar@erdman.name\",\"gender\":\"female\",\"status\":\"inactive\"}";
+        Mockito.verify(eventPublisherServiceFactory, Mockito.times(1)).getById("gcp-patient-registration");
 
-        Mockito.verify(publisherService, Mockito.times(defaultDescriptions().size())).publish(payload, "gcp-patient-registration");
+        Mockito.verify(feedClient, Mockito.times(defaultDescriptions().size())).processEvents();
     }
 
-    @Test
-    public void givenScheduledOfSubscribingAndNoRecordsFoundAgainstSubscription_whenSubscribing_thenDoNotPublishEvents() {
-        Mockito.when(subscriberConfiguration.getSubscribersAsPerOrderOfSubscriptionFor(BAHMNI)).thenReturn(defaultDescriptions());
-        GCPEventPublisherService publisherService = mock(GCPEventPublisherService.class);
-        Mockito.when(restTemplate.getForObject("https://gorest.co.in/public/v2/users",  List.class)).thenReturn(emptyResponse());
-
-        bahmniEventSubscriber.run();
-
-        Mockito.verify(publisherService, Mockito.times(0)).publish(any(), any());
-    }
-
-    @Test
-    public void givenScheduledOfSubscribing_whenSubscribing_thenFailedToSubscribeEvents() {
-        Mockito.when(subscriberConfiguration.getSubscribersAsPerOrderOfSubscriptionFor(BAHMNI)).thenReturn(defaultDescriptions());
-        Mockito.when(restTemplate.getForObject("https://gorest.co.in/public/v2/users",  List.class)).thenThrow(new RuntimeException());
-
-        assertThrows(FailedToSubscribeException.class, () -> bahmniEventSubscriber.run());
-    }
 
     @Test
     public void givenScheduledOfSubscribing_whenSubscribing_thenFailedToGetPublisher() {
         Mockito.when(subscriberConfiguration.getSubscribersAsPerOrderOfSubscriptionFor(BAHMNI)).thenReturn(defaultDescriptions());
         Mockito.when(eventPublisherServiceFactory.getById("gcp-patient-registration"))
                 .thenThrow(new PublisherNotConfiguredException("gcp-patient-registration"));
-        Mockito.when(restTemplate.getForObject("https://gorest.co.in/public/v2/users",  List.class)).thenReturn(defaultResponse());
 
         assertThrows(FailedToSubscribeException.class, () -> bahmniEventSubscriber.run());
+    }
+
+
+    @Test
+    public void givenEvent_whenInvokingProcessEventOnWorker_thenGetAndPublishPatientFeed() {
+        GCPEventPublisherService publisherService = mock(GCPEventPublisherService.class);
+        String publisherId = "gcp-patient-registration";
+        String baseURL = "http://openmrs:8080";
+        String feedURI = "/openmrs/ws/rest/v1/patient/bf379289-62b7-47b3-ab7b-5186cb6fc46c?v=full";
+        BahmniEventSubscriber.Worker worker = new BahmniEventSubscriber.Worker(bahmniHttpClient, baseURL, publisherService, publisherId);
+
+        Mockito.when(bahmniHttpClient.get(URI.create(baseURL+feedURI))).thenReturn(defaultResponse());
+        Mockito.doNothing().when(publisherService).publish(defaultResponse(), publisherId);
+
+        Event tempEvent = new Event("eventId", feedURI);
+        worker.process(tempEvent);
+
+        verify(bahmniHttpClient, times(1)).get(URI.create(baseURL+feedURI));
+        verify(publisherService, times(1)).publish(defaultResponse(), publisherId);
+    }
+
+    @Test
+    public void givenEventAndGetPatientFeedIsThrowingError_whenInvokingProcessEventOnWorker_thenShouldNotPublishPatientFeed() {
+        GCPEventPublisherService publisherService = mock(GCPEventPublisherService.class);
+        String publisherId = "gcp-patient-registration";
+        String baseURL = "http://openmrs:8080";
+        String feedURI = "/openmrs/ws/rest/v1/patient/bf379289-62b7-47b3-ab7b-5186cb6fc46c?v=full";
+        BahmniEventSubscriber.Worker worker = new BahmniEventSubscriber.Worker(bahmniHttpClient, baseURL, publisherService, publisherId);
+
+        Mockito.when(bahmniHttpClient.get(URI.create(baseURL+feedURI))).thenThrow(new RuntimeException());
+
+        Event tempEvent = new Event("eventId", feedURI);
+        try {
+            worker.process(tempEvent);
+        }catch (RuntimeException e) {}
+
+        verify(bahmniHttpClient, times(1)).get(URI.create(baseURL+feedURI));
+        verify(publisherService, times(0)).publish(defaultResponse(), publisherId);
     }
 
     private List<SubscriberConfiguration.SubscriberDescription> defaultDescriptions() {
@@ -136,8 +152,8 @@ class BahmniEventSubscriberTest {
         }
     }
 
-    private List defaultResponse() {
-       String json = """
+    private String defaultResponse() {
+        return """
                [
                  {
                    "id": 904244,
@@ -148,21 +164,5 @@ class BahmniEventSubscriberTest {
                  }
              ]
            """;
-        try {
-            return new ObjectMapper().readValue(json, List.class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private List emptyResponse() {
-        String json = """
-              []
-           """;
-        try {
-            return new ObjectMapper().readValue(json, List.class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

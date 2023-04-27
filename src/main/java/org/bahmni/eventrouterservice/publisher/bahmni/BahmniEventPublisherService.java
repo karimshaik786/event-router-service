@@ -24,6 +24,7 @@ public class BahmniEventPublisherService implements EventPublisherService {
     public void publish(String payload, String publisherId) {
         String endpoint = publisherConfiguration.getEndpointFor(publisherId);
         eventPublisher.publish(endpoint, payload);
+        logger.info("Successfully publish the message on url :" + endpoint);
         logger.debug("Successfully publish the message on url :" + endpoint + " with payload " + payload);
     }
 }
