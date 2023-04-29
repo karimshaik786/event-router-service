@@ -2,8 +2,8 @@ package org.bahmni.eventrouterservice.publisher.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bahmni.eventrouterservice.exception.FailedToLoadConfiguration;
-import org.bahmni.eventrouterservice.publisher.common.exception.EndpointNotConfiguredForPublisherException;
-import org.bahmni.eventrouterservice.publisher.common.exception.TopicNotConfiguredForPublisherException;
+import org.bahmni.eventrouterservice.publisher.exception.EndpointNotConfiguredForPublisherException;
+import org.bahmni.eventrouterservice.publisher.exception.TopicNotConfiguredForPublisherException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

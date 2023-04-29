@@ -2,10 +2,10 @@ package org.bahmni.eventrouterservice.subscriber.bahmni;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.bahmni.eventrouterservice.publisher.common.exception.PublisherNotConfiguredException;
-import org.bahmni.eventrouterservice.publisher.common.service.EventPublisherServiceFactory;
+import org.bahmni.eventrouterservice.publisher.exception.PublisherNotConfiguredException;
+import org.bahmni.eventrouterservice.publisher.service.EventPublisherServiceFactory;
 import org.bahmni.eventrouterservice.publisher.gcp.GCPEventPublisherService;
-import org.bahmni.eventrouterservice.subscriber.common.exception.FailedToSubscribeException;
+import org.bahmni.eventrouterservice.subscriber.exception.FailedToSubscribeException;
 import org.bahmni.eventrouterservice.subscriber.configuration.SubscriberConfiguration;
 import org.bahmni.webclients.HttpClient;
 import org.ict4h.atomfeed.client.domain.Event;
@@ -22,7 +22,7 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 
-import static org.bahmni.eventrouterservice.configuration.ServiceName.BAHMNI;
+import static org.bahmni.eventrouterservice.model.ServiceName.BAHMNI;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;

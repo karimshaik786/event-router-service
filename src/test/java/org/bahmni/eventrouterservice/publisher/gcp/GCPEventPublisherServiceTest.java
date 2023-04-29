@@ -1,6 +1,6 @@
 package org.bahmni.eventrouterservice.publisher.gcp;
 
-import org.bahmni.eventrouterservice.configuration.Topic;
+import org.bahmni.eventrouterservice.model.Topic;
 import org.bahmni.eventrouterservice.publisher.configuration.PublisherConfiguration;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

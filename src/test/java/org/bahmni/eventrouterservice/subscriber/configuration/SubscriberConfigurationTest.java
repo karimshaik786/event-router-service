@@ -1,7 +1,7 @@
 package org.bahmni.eventrouterservice.subscriber.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.bahmni.eventrouterservice.configuration.ServiceName;
+import org.bahmni.eventrouterservice.model.ServiceName;
 import org.bahmni.eventrouterservice.exception.FailedToLoadConfiguration;
 import org.junit.jupiter.api.Test;
 

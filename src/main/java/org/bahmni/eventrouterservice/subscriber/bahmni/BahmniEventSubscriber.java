@@ -2,10 +2,10 @@ package org.bahmni.eventrouterservice.subscriber.bahmni;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bahmni.eventrouterservice.configuration.ServiceName;
-import org.bahmni.eventrouterservice.publisher.common.service.EventPublisherService;
-import org.bahmni.eventrouterservice.publisher.common.service.EventPublisherServiceFactory;
-import org.bahmni.eventrouterservice.subscriber.common.exception.FailedToSubscribeException;
+import org.bahmni.eventrouterservice.model.ServiceName;
+import org.bahmni.eventrouterservice.publisher.service.EventPublisherService;
+import org.bahmni.eventrouterservice.publisher.service.EventPublisherServiceFactory;
+import org.bahmni.eventrouterservice.subscriber.exception.FailedToSubscribeException;
 import org.bahmni.eventrouterservice.subscriber.configuration.SubscriberConfiguration;
 import org.bahmni.eventrouterservice.subscriber.configuration.SubscriberConfiguration.SubscriberDescription;
 import org.bahmni.webclients.HttpClient;

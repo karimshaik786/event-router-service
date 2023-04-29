@@ -1,7 +1,7 @@
 package org.bahmni.eventrouterservice.subscriber.configuration;
 
-import org.bahmni.eventrouterservice.configuration.ServiceName;
-import org.bahmni.eventrouterservice.configuration.Topic;
+import org.bahmni.eventrouterservice.model.ServiceName;
+import org.bahmni.eventrouterservice.model.Topic;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.type.TypeReference;

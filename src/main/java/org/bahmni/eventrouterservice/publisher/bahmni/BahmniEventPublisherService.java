@@ -1,6 +1,6 @@
 package org.bahmni.eventrouterservice.publisher.bahmni;
 
-import org.bahmni.eventrouterservice.publisher.common.service.EventPublisherService;
+import org.bahmni.eventrouterservice.publisher.service.EventPublisherService;
 import org.bahmni.eventrouterservice.publisher.configuration.PublisherConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,7 +1,7 @@
-package org.bahmni.eventrouterservice.publisher.common.service;
+package org.bahmni.eventrouterservice.publisher.service;
 
 import org.bahmni.eventrouterservice.publisher.bahmni.BahmniEventPublisherService;
-import org.bahmni.eventrouterservice.publisher.common.exception.PublisherNotConfiguredException;
+import org.bahmni.eventrouterservice.publisher.exception.PublisherNotConfiguredException;
 import org.bahmni.eventrouterservice.publisher.configuration.PublisherConfiguration;
 import org.bahmni.eventrouterservice.publisher.gcp.GCPEventPublisherService;
 import org.springframework.beans.factory.annotation.Autowired;

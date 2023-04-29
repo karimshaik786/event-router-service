@@ -1,5 +1,6 @@
 package org.bahmni.eventrouterservice.subscriber.common.exception;
 
+import org.bahmni.eventrouterservice.subscriber.exception.FailedToSubscribeException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

@@ -1,9 +1,9 @@
 package org.bahmni.eventrouterservice.subscriber.gcp;
 
-import org.bahmni.eventrouterservice.configuration.ServiceName;
-import org.bahmni.eventrouterservice.publisher.common.service.EventPublisherService;
-import org.bahmni.eventrouterservice.publisher.common.service.EventPublisherServiceFactory;
-import org.bahmni.eventrouterservice.subscriber.common.exception.FailedToSubscribeException;
+import org.bahmni.eventrouterservice.model.ServiceName;
+import org.bahmni.eventrouterservice.publisher.service.EventPublisherService;
+import org.bahmni.eventrouterservice.publisher.service.EventPublisherServiceFactory;
+import org.bahmni.eventrouterservice.subscriber.exception.FailedToSubscribeException;
 import org.bahmni.eventrouterservice.subscriber.configuration.SubscriberConfiguration;
 import com.google.cloud.spring.pubsub.core.PubSubTemplate;
 import com.google.cloud.spring.pubsub.support.AcknowledgeablePubsubMessage;
