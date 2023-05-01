@@ -39,7 +39,7 @@ public class BahmniEventSubscriber implements Runnable {
 
                 EventPublisherService publisherService = eventPublisherServiceFactory.getById(subscriber.getPublisherId());
                 Worker newWorker = new Worker(bahmniHttpClient,
-                        feedProperties.baseURL(),
+                        feedProperties.getBaseUrl(),
                         publisherService,
                         subscriber.getPublisherId());
 

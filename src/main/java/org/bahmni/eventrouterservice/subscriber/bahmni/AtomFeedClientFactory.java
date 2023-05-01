@@ -25,11 +25,11 @@ public class AtomFeedClientFactory {
     private final HttpClient bahmniHttpClient;
     private final AtomFeedClientProperties feedProperties;
 
-    public FeedClient get(String feedURI,
+    public FeedClient get(String feedEndpoint,
                           EventWorker eventWorker) {
-        ClientCookies cookies = bahmniHttpClient.getCookies(URI.create(feedProperties.getAuthUri()));
+        ClientCookies cookies = bahmniHttpClient.getCookies(URI.create(feedProperties.getAuthUrl()));
         AllFeeds allFeeds = new AllFeeds(atomFeedProperties, cookies);
         return new AtomFeedClient(allFeeds, allMarkersJdbc, failedEventsJdbc,
-                atomFeedProperties, atomFeedSpringTransactionSupport, URI.create(feedURI), eventWorker);
+                atomFeedProperties, atomFeedSpringTransactionSupport, URI.create(feedProperties.getBaseUrl() + feedEndpoint), eventWorker);
     }
 }

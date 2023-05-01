@@ -23,7 +23,7 @@ public class AtomFeedClientConfiguration {
 
     @Bean
     public HttpClient bahmniHttpClient(AtomFeedClientProperties feedProperties) {
-        ConnectionDetails connectionDetails = new ConnectionDetails(feedProperties.getAuthUri()
+        ConnectionDetails connectionDetails = new ConnectionDetails(feedProperties.getAuthUrl()
                 , feedProperties.getUser(), feedProperties.getPassword(),
                 feedProperties.getConnectionTimeoutInMilliseconds(), feedProperties.getReplyTimeoutInMilliseconds());
         return new org.bahmni.webclients.HttpClient(connectionDetails,
