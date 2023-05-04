@@ -1,5 +1,6 @@
 package org.bahmni.eventrouterservice.publisher.common.exception;
 
+import org.bahmni.eventrouterservice.publisher.exception.EndpointNotConfiguredForPublisherException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

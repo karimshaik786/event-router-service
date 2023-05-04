@@ -1,4 +1,4 @@
-package org.bahmni.eventrouterservice.publisher.common.exception;
+package org.bahmni.eventrouterservice.publisher.exception;
 
 public class EndpointNotConfiguredForPublisherException extends RuntimeException {
     public EndpointNotConfiguredForPublisherException(String publisherId) {

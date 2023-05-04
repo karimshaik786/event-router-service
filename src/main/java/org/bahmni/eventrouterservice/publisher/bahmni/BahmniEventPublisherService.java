@@ -1,6 +1,6 @@
 package org.bahmni.eventrouterservice.publisher.bahmni;
 
-import org.bahmni.eventrouterservice.publisher.common.service.EventPublisherService;
+import org.bahmni.eventrouterservice.publisher.service.EventPublisherService;
 import org.bahmni.eventrouterservice.publisher.configuration.PublisherConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +24,7 @@ public class BahmniEventPublisherService implements EventPublisherService {
     public void publish(String payload, String publisherId) {
         String endpoint = publisherConfiguration.getEndpointFor(publisherId);
         eventPublisher.publish(endpoint, payload);
+        logger.info("Successfully publish the message on url :" + endpoint);
         logger.debug("Successfully publish the message on url :" + endpoint + " with payload " + payload);
     }
 }

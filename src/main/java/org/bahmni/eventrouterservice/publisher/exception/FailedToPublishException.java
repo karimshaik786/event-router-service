@@ -1,4 +1,4 @@
-package org.bahmni.eventrouterservice.publisher.common.exception;
+package org.bahmni.eventrouterservice.publisher.exception;
 
 public class FailedToPublishException extends RuntimeException {
     public FailedToPublishException(String destination, Exception exception) {

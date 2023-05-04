@@ -1,6 +1,6 @@
 package org.bahmni.eventrouterservice.subscriber.configuration;
 
-import org.bahmni.eventrouterservice.configuration.ServiceName;
+import org.bahmni.eventrouterservice.model.ServiceName;
 import org.bahmni.eventrouterservice.subscriber.bahmni.BahmniEventSubscriber;
 import org.bahmni.eventrouterservice.subscriber.gcp.GCPEventSubscriber;
 import org.bahmni.eventrouterservice.subscriber.configuration.SubscriberConfiguration.SubscriberSchedule;

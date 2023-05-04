@@ -1,4 +1,4 @@
-package org.bahmni.eventrouterservice.configuration;
+package org.bahmni.eventrouterservice.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 

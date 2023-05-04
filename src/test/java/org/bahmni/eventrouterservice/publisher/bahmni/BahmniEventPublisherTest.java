@@ -1,6 +1,6 @@
 package org.bahmni.eventrouterservice.publisher.bahmni;
 
-import org.bahmni.eventrouterservice.publisher.common.exception.FailedToPublishException;
+import org.bahmni.eventrouterservice.publisher.exception.FailedToPublishException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

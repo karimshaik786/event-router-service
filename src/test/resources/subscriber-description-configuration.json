@@ -12,7 +12,7 @@
   {
     "source": {
       "serviceName": "BAHMNI",
-      "endpoint": "https://gorest.co.in/public/v2/users/updation"
+      "endpoint": "/public/v2/users/updation"
     },
     "orderOfSubscription": 2,
     "publisherId": "gcp-patient-updation"
@@ -20,7 +20,7 @@
   {
     "source": {
       "serviceName": "BAHMNI",
-      "endpoint": "https://gorest.co.in/public/v2/users"
+      "endpoint": "/public/v2/users"
     },
     "orderOfSubscription": 1,
     "publisherId": "gcp-patient-registration"
