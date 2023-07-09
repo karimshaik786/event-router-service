@@ -1,0 +1,29 @@
+[
+  {
+    "source": {
+      "topic": {
+        "name": "bahmni-patient"
+      }
+    },
+    "destination": {
+      "topic": {
+        "name": "patient-registration"
+      }
+    },
+    "errorDestination": {
+      "queue": {
+        "name": "event-router-service:bahmni-patient-dlq"
+      },
+      "maxRetryDelivery": 2,
+      "retryDeliveryDelayInMills": 2000,
+      "cronExpressionForRetryStart": "* 5 * * * ?",
+      "cronExpressionForRetryStop": "* 10 * * * ?"
+    },
+    "additionalProperties": {
+      "facility": "Ethopia"
+    },
+    "filterOnProperties": {
+      "confirmedPatient": true
+    }
+  }
+]
