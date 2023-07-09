@@ -23,7 +23,6 @@ class BahmniPayloadProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        log.info("Start processing message...");
         if(routeDescription.getAdditionalProperties().isEmpty()) {
             log.info("Empty additional properties");
             return;
@@ -31,7 +30,6 @@ class BahmniPayloadProcessor implements Processor {
         String payloadAsJsonString = exchange.getIn().getBody(String.class);
         String updatedPayloadAsJson = addStaticData(payloadAsJsonString, routeDescription.getAdditionalProperties());
         exchange.getIn().setBody(updatedPayloadAsJson);
-        log.info("Processing message completed...");
     }
 
     private String addStaticData(String jsonBodyAsString, LinkedHashMap<String, String> additionalProperties) {
