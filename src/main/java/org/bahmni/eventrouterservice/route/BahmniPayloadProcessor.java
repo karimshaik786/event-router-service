@@ -30,6 +30,14 @@ class BahmniPayloadProcessor implements Processor {
         String payloadAsJsonString = exchange.getIn().getBody(String.class);
         String updatedPayloadAsJson = addStaticData(payloadAsJsonString, routeDescription.getAdditionalProperties());
         exchange.getIn().setBody(updatedPayloadAsJson);
+
+        String destinationTopic = getDestination(exchange.getIn().getHeader("eventType"));
+        exchange.getIn().setHeader("destination", destinationTopic);
+    }
+
+    private String getDestination(Object eventType) {
+        String eventTypeAsString = (String) eventType;
+        return routeDescription.getDestinationBasedOn(eventTypeAsString).getTopic().getName();
     }
 
     private String addStaticData(String jsonBodyAsString, LinkedHashMap<String, String> additionalProperties) {
@@ -41,6 +49,23 @@ class BahmniPayloadProcessor implements Processor {
         } catch (JsonProcessingException exception) {
             log.info("Failed to process payload : " + exception.getMessage());
             throw new RuntimeException(exception);
+        }
+    }
+
+    public enum EventHeaderKey {
+        EVENT_TYPE("eventType"),
+        PAYLOAD_ID("payloadId"),
+        EVENT_ID("eventId"),
+        PUBLISHED_DATE_TIME("publishedDateTime");
+
+        private final String key;
+
+        EventHeaderKey(String key) {
+            this.key = key;
+        }
+
+        public String key() {
+            return key;
         }
     }
 }

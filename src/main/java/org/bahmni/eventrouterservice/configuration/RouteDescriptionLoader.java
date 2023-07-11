@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bahmni.eventrouterservice.exception.NoDestinationConfiguredForEventType;
 import org.bahmni.eventrouterservice.exception.FailedToLoadConfiguration;
 import org.bahmni.eventrouterservice.model.Queue;
 import org.bahmni.eventrouterservice.model.Topic;
@@ -51,12 +53,21 @@ public class RouteDescriptionLoader {
     @JsonIgnoreProperties(ignoreUnknown = true)
     @Getter
     @NoArgsConstructor
+    @AllArgsConstructor
     public static class RouteDescription {
         private Source source;
-        private Destination destination;
+        private List<Destination> destinations;
         private ErrorDestination errorDestination;
-        private LinkedHashMap<String, String> additionalProperties;
-        private LinkedHashMap<String, String> filterOnProperties;
+        private LinkedHashMap<String, String> additionalProperties = new LinkedHashMap<>(0);
+        private LinkedHashMap<String, String> filterOnProperties = new LinkedHashMap<>(0);
+
+        public Destination getDestinationBasedOn(String eventType) {
+            BahmniEventType bahmniEventType = BahmniEventType.valueOf(eventType.toUpperCase());
+            return destinations.stream()
+                    .filter(destination -> destination.forEventType(bahmniEventType))
+                    .findFirst()
+                    .orElseThrow(() -> new NoDestinationConfiguredForEventType(bahmniEventType));
+        }
     }
 
     @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
@@ -71,9 +82,15 @@ public class RouteDescriptionLoader {
     @JsonIgnoreProperties(ignoreUnknown = true)
     @Getter
     @NoArgsConstructor
+    @AllArgsConstructor
     public static class Destination {
+        private BahmniEventType onEventType;
         private Topic topic;
         private Queue queue;
+
+        public boolean forEventType(BahmniEventType bahmniEventType) {
+            return onEventType.equals(bahmniEventType);
+        }
     }
 
     @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
@@ -85,5 +102,9 @@ public class RouteDescriptionLoader {
         private Long retryDeliveryDelayInMills;
         private String cronExpressionForRetryStart;
         private String cronExpressionForRetryStop;
+    }
+
+    public enum BahmniEventType {
+        BAHMNI_PATIENT_CREATED, BAHMNI_PATIENT_UPDATED;
     }
 }
