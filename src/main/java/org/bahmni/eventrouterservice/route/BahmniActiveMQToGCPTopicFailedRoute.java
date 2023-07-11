@@ -54,8 +54,8 @@ public class BahmniActiveMQToGCPTopicFailedRoute extends RouteBuilder {
                 .log(INFO, "Received failed message from ActiveMQ queue : " + routeDescription.getErrorDestination().getQueue().getName())
                 .filter(bahmniPayloadPropertiesFilterPredicateFor)
                 .process(bahmniPayloadProcessor)
-                .to("google-pubsub:"+googlePubSubProjectId+":"+routeDescription.getDestination().getTopic().getName())
-                .log("Failed Message sent to Google PubSub on topic : "+routeDescription.getDestination().getTopic().getName());
+                .toD("google-pubsub:"+googlePubSubProjectId+":"+"${headers.destination}")
+                .log("Message sent to Google PubSub on topic : "+"${headers.destination}");
         });
     }
 }
