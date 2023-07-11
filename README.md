@@ -24,7 +24,7 @@ sample configuration file: [](src/test/resources/route-descriptions.json)
 
 Explanation:
 - source define the bahmni topic to be consumed.
-- destination defines the gcp topic to be published to.
+- destination defines the gcp topic to be published to based on the eventType. This eventType we expect to receive in header.
 - errorDestination defines the one of the queue in JMS to be published to in case of error.
 - maxRetryDelivery defines the number of times the message should be retried to be published to gcp topic in case of error.
 - retryDelay defines the delay between each retry.

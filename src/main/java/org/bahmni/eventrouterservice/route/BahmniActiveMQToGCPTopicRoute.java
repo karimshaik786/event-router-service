@@ -40,7 +40,7 @@ public class BahmniActiveMQToGCPTopicRoute extends RouteBuilder {
             BahmniPayloadProcessor bahmniPayloadProcessor = new BahmniPayloadProcessor(objectMapper, routeDescription);
 
             from("activemq:topic:" + routeDescription.getSource().getTopic().getName()+"?durableSubscriptionName="+routeDescription.getSource().getTopic().getName()+"&clientId="+serviceName)
-                .log(INFO, "Received message from ActiveMQ topic : " + routeDescription.getSource().getTopic().getName())
+                .log(INFO, "Received message from ActiveMQ with headers : ${headers}")
                 .onException(Exception.class)
                     .handled(true)
                     .log(INFO, "Error while processing message from ActiveMQ topic : " + routeDescription.getSource().getTopic().getName())
@@ -52,8 +52,8 @@ public class BahmniActiveMQToGCPTopicRoute extends RouteBuilder {
                 .end()
                 .filter(bahmniPayloadFilter)
                 .process(bahmniPayloadProcessor)
-                .to("google-pubsub:"+googlePubSubProjectId+":"+routeDescription.getDestination().getTopic().getName())
-                .log("Message sent to Google PubSub on topic : "+routeDescription.getDestination().getTopic().getName());
+                .toD("google-pubsub:"+googlePubSubProjectId+":"+"${headers.destination}")
+                .log("Message sent to Google PubSub on topic : "+"${headers.destination}");
         });
     }
 }
