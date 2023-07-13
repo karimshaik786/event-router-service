@@ -2,7 +2,6 @@ package org.bahmni.eventrouterservice.route;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.camel.CamelContext;
-import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.routepolicy.quartz.CronScheduledRoutePolicy;
 import org.bahmni.eventrouterservice.configuration.RouteDescriptionLoader;
@@ -10,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
+import static org.apache.camel.LoggingLevel.ERROR;
 import static org.apache.camel.LoggingLevel.INFO;
 
 @Component
@@ -49,7 +49,7 @@ public class BahmniActiveMQToGCPTopicFailedRoute extends RouteBuilder {
                 .noAutoStartup()
                 .onException(Exception.class)
                     .handled(true)
-                    .log(LoggingLevel.ERROR, "Following exception occurred : ${exception.message} for processing the payload : ${body}")
+                    .log(ERROR, "Following exception occurred : ${exception.message} for processing the payload : ${body}")
                 .end()
                 .log(INFO, "Received failed message from ActiveMQ queue : " + routeDescription.getErrorDestination().getQueue().getName())
                 .filter(bahmniPayloadPropertiesFilterPredicateFor)
