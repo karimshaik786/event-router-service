@@ -4,13 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
-import org.bahmni.eventrouterservice.configuration.RouteDescriptionLoader;
+import org.apache.camel.util.json.JsonObject;
 import org.bahmni.eventrouterservice.configuration.RouteDescriptionLoader.RouteDescription;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.FileSystemResource;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.LinkedHashMap;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -21,11 +24,11 @@ import static org.mockito.Mockito.when;
 class BahmniPayloadFilterTest {
 
     @Test
-    public void givenFilterPropertyKeyWithValuePresentInPayload_whenApplyFilters_thenShouldReturnTrue() {
+    public void givenFilterPropertyKeyWithValuePresentInPayload_whenApplyFilters_thenShouldReturnTrue() throws IOException {
 
         RouteDescription routeDescription = mock(RouteDescription.class);
         LinkedHashMap<String, String> filterOnProperties = new LinkedHashMap<>();
-        filterOnProperties.put("uuid", "patientUuid");
+        filterOnProperties.put("display", "confirmedPatient = true");
         when(routeDescription.getFilterOnProperties()).thenReturn(filterOnProperties);
 
         BahmniPayloadFilter bahmniPayloadFilter = new BahmniPayloadFilter(new ObjectMapper(), routeDescription);
@@ -33,7 +36,9 @@ class BahmniPayloadFilterTest {
         Exchange exchange = mock(Exchange.class);
         Message message = mock(Message.class);
         when(exchange.getIn()).thenReturn(message);
-        when(message.getBody(String.class)).thenReturn("{ \"person\": { \"uuid\": \"patientUuid\" } }");
+        File routeConfigurationFile = new FileSystemResource("src/test/resources/test-patient.json").getFile();
+        JsonObject payload = new ObjectMapper().readValue(routeConfigurationFile, JsonObject.class);
+        when(message.getBody(String.class)).thenReturn(payload.toJson());
 
         boolean matches = bahmniPayloadFilter.matches(exchange);
 

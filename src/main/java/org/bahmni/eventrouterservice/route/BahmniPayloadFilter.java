@@ -33,8 +33,9 @@ class BahmniPayloadFilter implements Predicate {
         try {
             JsonNode payload = objectMapper.readValue(exchange.getIn().getBody(String.class), JsonNode.class);
             for (Map.Entry<String, String> filterCondition : routeDescription.getFilterOnProperties().entrySet()) {
-                matches = matches && payload.findValue(filterCondition.getKey()) != null
-                        && payload.findValue(filterCondition.getKey()).asText().equals(filterCondition.getValue());
+                  matches = matches
+                          && payload.findValue(filterCondition.getKey()) != null
+                          && payload.findValues(filterCondition.getKey()).stream().anyMatch(node -> node.asText("").equals(filterCondition.getValue()));
             }
             log.info("Filters conditions matches : " + matches +" for uuid : "+payload.get("uuid"));
             return matches;
