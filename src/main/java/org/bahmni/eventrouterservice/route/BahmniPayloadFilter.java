@@ -1,11 +1,11 @@
 package org.bahmni.eventrouterservice.route;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
-import org.apache.camel.util.json.JsonObject;
 import org.bahmni.eventrouterservice.configuration.RouteDescriptionLoader.RouteDescription;
 
 import java.util.Map;
@@ -31,9 +31,10 @@ class BahmniPayloadFilter implements Predicate {
         boolean matches = true;
 
         try {
-            JsonObject payload = objectMapper.readValue(exchange.getIn().getBody(String.class), JsonObject.class);
+            JsonNode payload = objectMapper.readValue(exchange.getIn().getBody(String.class), JsonNode.class);
             for (Map.Entry<String, String> filterCondition : routeDescription.getFilterOnProperties().entrySet()) {
-                matches = matches && payload.containsKey(filterCondition.getKey()) && payload.get(filterCondition.getKey()).equals(filterCondition.getValue());
+                matches = matches && payload.findValue(filterCondition.getKey()) != null
+                        && payload.findValue(filterCondition.getKey()).asText().equals(filterCondition.getValue());
             }
             log.info("Filters conditions matches : " + matches +" for uuid : "+payload.get("uuid"));
             return matches;
