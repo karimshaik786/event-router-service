@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
+import static org.apache.camel.LoggingLevel.ERROR;
 import static org.apache.camel.LoggingLevel.INFO;
 
 @Component
@@ -43,7 +44,7 @@ public class BahmniActiveMQToGCPTopicRoute extends RouteBuilder {
                 .log(INFO, "Received message from ActiveMQ with headers : ${headers}")
                 .onException(Exception.class)
                     .handled(true)
-                    .log(INFO, "Error while processing message from ActiveMQ topic : " + routeDescription.getSource().getTopic().getName())
+                    .log(ERROR, "Error while processing message from ActiveMQ topic : " + routeDescription.getSource().getTopic().getName() + " with exception as : ${exception.message}")
                     .useOriginalMessage()
                     .redeliveryDelay(routeDescription.getErrorDestination().getRetryDeliveryDelayInMills())
                     .maximumRedeliveries(routeDescription.getErrorDestination().getMaxRetryDelivery())
