@@ -33,7 +33,7 @@ class BahmniPayloadFilterTest {
         Exchange exchange = mock(Exchange.class);
         Message message = mock(Message.class);
         when(exchange.getIn()).thenReturn(message);
-        when(message.getBody(String.class)).thenReturn("{\"uuid\":\"patientUuid\"}");
+        when(message.getBody(String.class)).thenReturn("{ \"person\": { \"uuid\": \"patientUuid\" } }");
 
         boolean matches = bahmniPayloadFilter.matches(exchange);
 
