@@ -40,11 +40,14 @@ public class BahmniActiveMQToGCPTopicRoute extends RouteBuilder {
             BahmniPayloadFilter bahmniPayloadFilter = new BahmniPayloadFilter(objectMapper, routeDescription);
             BahmniPayloadProcessor bahmniPayloadProcessor = new BahmniPayloadProcessor(objectMapper, routeDescription);
 
-            from("activemq:topic:" + routeDescription.getSource().getTopic().getName()+"?durableSubscriptionName="+routeDescription.getSource().getTopic().getName()+"&clientId="+serviceName)
+            String sourceTopic = routeDescription.getSource().getTopic().getName();
+            String uniqueClientId = serviceName + ":" + sourceTopic;
+
+            from("activemq:topic:" + sourceTopic + "?durableSubscriptionName=" + sourceTopic + "&clientId=" + uniqueClientId)
                 .log(INFO, "Received message from ActiveMQ with headers : ${headers}")
                 .onException(Exception.class)
                     .handled(true)
-                    .log(ERROR, "Error while processing message from ActiveMQ topic : " + routeDescription.getSource().getTopic().getName() + " with exception as : ${exception.message}")
+                    .log(ERROR, "Error while processing message from ActiveMQ topic : " + sourceTopic + " with exception as : ${exception.message}")
                     .useOriginalMessage()
                     .redeliveryDelay(routeDescription.getErrorDestination().getRetryDeliveryDelayInMills())
                     .maximumRedeliveries(routeDescription.getErrorDestination().getMaxRetryDelivery())
