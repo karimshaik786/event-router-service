@@ -47,23 +47,3 @@ jobs:
           file: Dockerfile
           push: true
           tags: bahmni/event-router-service:${{ github.run_number }}, bahmni/event-router-service:latest
-
-  trigger-workflow:
-    name: Trigger workflow to deploy to docker env
-    needs:
-      - build-publish-docker
-      - Trivy
-    runs-on: ubuntu-latest
-    env:
-      EVENT_TYPE: bahmni-ipd-event-router-service-event
-    steps:
-      - name: Create repository_dispatch
-        run: |
-          trigger_result=$(curl -s -o trigger_response.txt -w "%{http_code}" -X POST -H "Accept: application/vnd.github.v3+json" -H 'authorization: Bearer ${{ secrets.IPD_PAT }}' https://api.github.com/repos/${{ secrets.IPD_ORG_NAME }}/${{ secrets.IPD_REPOSITORY_NAME }}/dispatches -d '{"event_type":"'"${EVENT_TYPE}"'"}')
-          if [ $trigger_result == 204 ];then
-            echo "Trigger Success"
-          else
-            echo "Trigger Failed"
-            cat trigger_response.txt
-            exit 1
-          fi
