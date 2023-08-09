@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.util.json.JsonObject;
+import org.bahmni.eventrouterservice.configuration.RouteDescriptionLoader.FilterBy;
 import org.bahmni.eventrouterservice.configuration.RouteDescriptionLoader.RouteDescription;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -21,17 +22,19 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class BahmniPayloadFilterTest {
+class EventPropertiesFilterTest {
 
     @Test
-    public void givenFilterPropertyKeyWithValuePresentInPayload_whenApplyFilters_thenShouldReturnTrue() throws IOException {
+    public void givenFilterConditions_whenApplied_thenShouldReturnAMatch() throws IOException {
 
         RouteDescription routeDescription = mock(RouteDescription.class);
+        FilterBy filterBy = mock(FilterBy.class);
         LinkedHashMap<String, String> filterOnProperties = new LinkedHashMap<>();
         filterOnProperties.put("display", "confirmedPatient = true");
-        when(routeDescription.getFilterOnProperties()).thenReturn(filterOnProperties);
+        when(routeDescription.getFilterBy()).thenReturn(filterBy);
+        when(filterBy.getEventProperties()).thenReturn(filterOnProperties);
 
-        BahmniPayloadFilter bahmniPayloadFilter = new BahmniPayloadFilter(new ObjectMapper(), routeDescription);
+        EventPropertiesFilter eventPropertiesFilter = new EventPropertiesFilter(new ObjectMapper(), routeDescription);
 
         Exchange exchange = mock(Exchange.class);
         Message message = mock(Message.class);
@@ -40,61 +43,67 @@ class BahmniPayloadFilterTest {
         JsonObject payload = new ObjectMapper().readValue(routeConfigurationFile, JsonObject.class);
         when(message.getBody(String.class)).thenReturn(payload.toJson());
 
-        boolean matches = bahmniPayloadFilter.matches(exchange);
+        boolean matches = eventPropertiesFilter.matches(exchange);
 
         Assertions.assertTrue(matches);
     }
 
     @Test
-    public void givenFilterPropertyKeyNotPresentInPayload_whenApplyFilters_thenShouldReturnFalse() {
+    public void givenFilterConditions_whenApplied_thenShouldReturnANOMatch() {
 
         RouteDescription routeDescription = mock(RouteDescription.class);
+        FilterBy filterBy = mock(FilterBy.class);
         LinkedHashMap<String, String> filterOnProperties = new LinkedHashMap<>();
         filterOnProperties.put("uuid1", "patientUuid");
-        when(routeDescription.getFilterOnProperties()).thenReturn(filterOnProperties);
+        when(routeDescription.getFilterBy()).thenReturn(filterBy);
+        when(filterBy.getEventProperties()).thenReturn(filterOnProperties);
 
-        BahmniPayloadFilter bahmniPayloadFilter = new BahmniPayloadFilter(new ObjectMapper(), routeDescription);
+        EventPropertiesFilter eventPropertiesFilter = new EventPropertiesFilter(new ObjectMapper(), routeDescription);
 
         Exchange exchange = mock(Exchange.class);
         Message message = mock(Message.class);
         when(exchange.getIn()).thenReturn(message);
         when(message.getBody(String.class)).thenReturn("{\"uuid\":\"patientUuid\"}");
 
-        boolean matches = bahmniPayloadFilter.matches(exchange);
+        boolean matches = eventPropertiesFilter.matches(exchange);
 
         Assertions.assertFalse(matches);
     }
 
     @Test
-    public void givenFiltersAreEmpty_whenApplyFilters_thenShouldReturnTrue() {
+    public void givenNoFilterConditions_whenApplied_thenShouldReturnAMatch() {
 
         RouteDescription routeDescription = mock(RouteDescription.class);
-        when(routeDescription.getFilterOnProperties()).thenReturn(Maps.newLinkedHashMap());
+        FilterBy filterBy = mock(FilterBy.class);
+        when(routeDescription.getFilterBy()).thenReturn(filterBy);
+        when(filterBy.getEventProperties()).thenReturn(Maps.newLinkedHashMap());
 
-        BahmniPayloadFilter bahmniPayloadFilter = new BahmniPayloadFilter(new ObjectMapper(), routeDescription);
+        EventPropertiesFilter eventPropertiesFilter = new EventPropertiesFilter(new ObjectMapper(), routeDescription);
 
         Exchange exchange = mock(Exchange.class);
 
-        boolean matches = bahmniPayloadFilter.matches(exchange);
+        boolean matches = eventPropertiesFilter.matches(exchange);
 
         Assertions.assertTrue(matches);
     }
 
     @Test
-    public void givenFilterPropertyKeyWithValuePresentInInvalidPayload_whenApplyFilters_thenShouldThrowRuntimeException() {
+    public void givenFilterConditions_whenAppliedOnInvalidPayload_thenShouldThrowException() {
 
         RouteDescription routeDescription = mock(RouteDescription.class);
+        FilterBy filterBy = mock(FilterBy.class);
         LinkedHashMap<String, String> filterOnProperties = new LinkedHashMap<>();
         filterOnProperties.put("uuid", "patientUuid");
-        when(routeDescription.getFilterOnProperties()).thenReturn(filterOnProperties);
+        when(routeDescription.getFilterBy()).thenReturn(filterBy);
+        when(filterBy.getEventProperties()).thenReturn(filterOnProperties);
 
-        BahmniPayloadFilter bahmniPayloadFilter = new BahmniPayloadFilter(new ObjectMapper(), routeDescription);
+        EventPropertiesFilter eventPropertiesFilter = new EventPropertiesFilter(new ObjectMapper(), routeDescription);
 
         Exchange exchange = mock(Exchange.class);
         Message message = mock(Message.class);
         when(exchange.getIn()).thenReturn(message);
         when(message.getBody(String.class)).thenReturn("{uuid\":\"patientUuid\"}");
 
-        assertThrows(RuntimeException.class, () -> bahmniPayloadFilter.matches(exchange));
+        assertThrows(RuntimeException.class, () -> eventPropertiesFilter.matches(exchange));
     }
 }

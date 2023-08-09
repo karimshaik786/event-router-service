@@ -59,7 +59,8 @@ public class RouteDescriptionLoader {
         private List<Destination> destinations;
         private ErrorDestination errorDestination;
         private LinkedHashMap<String, String> additionalProperties = new LinkedHashMap<>(0);
-        private LinkedHashMap<String, String> filterOnProperties = new LinkedHashMap<>(0);
+        private LinkedHashMap<String, String> derivedProperties = new LinkedHashMap<>(0);
+        private FilterBy filterBy;
 
         public Destination getDestinationBasedOn(String eventType) {
             BahmniEventType bahmniEventType = BahmniEventType.valueOf(eventType.toUpperCase());
@@ -68,6 +69,15 @@ public class RouteDescriptionLoader {
                     .findFirst()
                     .orElseThrow(() -> new NoDestinationConfiguredForEventType(bahmniEventType));
         }
+    }
+
+    @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @Getter
+    @NoArgsConstructor
+    public static class FilterBy {
+        private LinkedHashMap<String, String> eventProperties = new LinkedHashMap<>(0);
+        private LinkedHashMap<String, String> patientProperties = new LinkedHashMap<>(0);
     }
 
     @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
@@ -106,5 +116,14 @@ public class RouteDescriptionLoader {
 
     public enum BahmniEventType {
         BAHMNI_PATIENT_CREATED, BAHMNI_PATIENT_UPDATED, BAHMNI_APPOINTMENT_CREATED, BAHMNI_APPOINTMENT_UPDATED, BAHMNI_ENCOUNTER_CREATED, BAHMNI_ENCOUNTER_UPDATED;
+    }
+
+    @Getter
+    public enum DerivedPropertiesKey {
+        PATIENT_UUID("patientUuid");
+        private final String value;
+        DerivedPropertiesKey(String patientUuid) {
+            this.value = patientUuid;
+        }
     }
 }

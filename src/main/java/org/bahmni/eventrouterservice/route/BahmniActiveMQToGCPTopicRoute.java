@@ -19,26 +19,30 @@ public class BahmniActiveMQToGCPTopicRoute extends RouteBuilder {
     private final String googlePubSubProjectId;
     private final String serviceName;
     private final ObjectMapper objectMapper;
+    private final BahmniAPIGateway bahmniAPIGateway;
 
     public BahmniActiveMQToGCPTopicRoute(CamelContext context,
                                          RouteDescriptionLoader routeDescriptionLoader,
                                          @Value("${google-pubsub.project-id}") String googlePubSubProjectId,
                                          @Value("${service.name}") String serviceName,
-                                         ObjectMapper objectMapper) {
+                                         ObjectMapper objectMapper, BahmniAPIGateway bahmniAPIGateway) {
         super(context);
         this.routeDescriptionLoader = routeDescriptionLoader;
         this.googlePubSubProjectId = googlePubSubProjectId;
         this.serviceName = serviceName;
         this.objectMapper = objectMapper;
+        this.bahmniAPIGateway = bahmniAPIGateway;
     }
 
     @Override
-    public void configure() throws Exception {
+    public void configure() {
 
         routeDescriptionLoader.getRouteDescriptions().forEach(routeDescription -> {
 
-            BahmniPayloadFilter bahmniPayloadFilter = new BahmniPayloadFilter(objectMapper, routeDescription);
-            BahmniPayloadProcessor bahmniPayloadProcessor = new BahmniPayloadProcessor(objectMapper, routeDescription);
+            EventPropertiesFilter eventPropertiesFilter = new EventPropertiesFilter(objectMapper, routeDescription);
+            PatientPropertiesFilter patientPropertiesFilter = new PatientPropertiesFilter(objectMapper, routeDescription, bahmniAPIGateway);
+            EventProcessor eventProcessor = new EventProcessor(objectMapper, routeDescription);
+            DerivedPropertiesGenerator derivedPropertiesGenerator = new DerivedPropertiesGenerator(routeDescription);
 
             String sourceTopic = routeDescription.getSource().getTopic().getName();
             String uniqueClientId = serviceName + ":" + sourceTopic;
@@ -54,8 +58,10 @@ public class BahmniActiveMQToGCPTopicRoute extends RouteBuilder {
                     .to("activemq:queue:" + routeDescription.getErrorDestination().getQueue().getName())
                     .log("Message sent to ActiveMQ failed message queue: "+routeDescription.getErrorDestination().getQueue().getName())
                 .end()
-                .filter(bahmniPayloadFilter)
-                .process(bahmniPayloadProcessor)
+                .filter(eventPropertiesFilter)
+                .process(derivedPropertiesGenerator)
+                .filter(patientPropertiesFilter)
+                .process(eventProcessor)
                 .toD("google-pubsub:"+googlePubSubProjectId+":"+"${headers.destination}")
                 .log("Message sent to Google PubSub on topic : "+"${headers.destination}");
         });

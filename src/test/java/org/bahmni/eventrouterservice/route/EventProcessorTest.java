@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class BahmniPayloadProcessorTest {
+class EventProcessorTest {
 
     @Test
     public void givenAdditionalPropertyKeyWithValue_whenStartProcessing_thenShouldAddInPayload() {
@@ -31,7 +31,7 @@ class BahmniPayloadProcessorTest {
         when(routeDescription.getDestinationBasedOn("BAHMNI_PATIENT_UPDATED")).thenReturn(destination);
 
 
-        BahmniPayloadProcessor bahmniPayloadProcessor = new BahmniPayloadProcessor(new ObjectMapper(), routeDescription);
+        EventProcessor eventProcessor = new EventProcessor(new ObjectMapper(), routeDescription);
 
         Exchange exchange = mock(Exchange.class);
         Message message = mock(Message.class);
@@ -39,7 +39,7 @@ class BahmniPayloadProcessorTest {
         when(message.getBody(String.class)).thenReturn("{\"uuid\":\"patientUuid\"}");
         when(message.getHeader("eventType")).thenReturn("BAHMNI_PATIENT_UPDATED");
 
-        assertDoesNotThrow(() -> bahmniPayloadProcessor.process(exchange));
+        assertDoesNotThrow(() -> eventProcessor.process(exchange));
 
         verify(message, times(1)).setBody("{\"uuid\":\"patientUuid\",\"facility\":\"Ethopia\"}");
     }
@@ -54,7 +54,7 @@ class BahmniPayloadProcessorTest {
         when(routeDescription.getAdditionalProperties()).thenReturn(additionalProperties);
         when(routeDescription.getDestinationBasedOn("BAHMNI_PATIENT_UPDATED")).thenReturn(destination);
 
-        BahmniPayloadProcessor bahmniPayloadProcessor = new BahmniPayloadProcessor(new ObjectMapper(), routeDescription);
+        EventProcessor eventProcessor = new EventProcessor(new ObjectMapper(), routeDescription);
 
         Exchange exchange = mock(Exchange.class);
         Message message = mock(Message.class);
@@ -62,7 +62,7 @@ class BahmniPayloadProcessorTest {
         when(message.getBody(String.class)).thenReturn("{\"uuid\":\"patientUuid\"}");
         when(message.getHeader("eventType")).thenReturn("BAHMNI_PATIENT_UPDATED");
 
-        assertDoesNotThrow(() -> bahmniPayloadProcessor.process(exchange));
+        assertDoesNotThrow(() -> eventProcessor.process(exchange));
 
         verify(message, times(1)).setHeader("destination", "topicName");
     }
@@ -74,11 +74,11 @@ class BahmniPayloadProcessorTest {
         LinkedHashMap<String, String> additionalProperties = new LinkedHashMap<>();
         when(routeDescription.getAdditionalProperties()).thenReturn(additionalProperties);
 
-        BahmniPayloadProcessor bahmniPayloadProcessor = new BahmniPayloadProcessor(new ObjectMapper(), routeDescription);
+        EventProcessor eventProcessor = new EventProcessor(new ObjectMapper(), routeDescription);
 
         Exchange exchange = mock(Exchange.class);
 
-        assertDoesNotThrow(() -> bahmniPayloadProcessor.process(exchange));
+        assertDoesNotThrow(() -> eventProcessor.process(exchange));
 
         verify(exchange, times(0)).getIn(any());
     }
@@ -91,13 +91,13 @@ class BahmniPayloadProcessorTest {
         additionalProperties.put("facility", "Ethopia");
         when(routeDescription.getAdditionalProperties()).thenReturn(additionalProperties);
 
-        BahmniPayloadProcessor bahmniPayloadProcessor = new BahmniPayloadProcessor(new ObjectMapper(), routeDescription);
+        EventProcessor eventProcessor = new EventProcessor(new ObjectMapper(), routeDescription);
 
         Exchange exchange = mock(Exchange.class);
         Message message = mock(Message.class);
         when(exchange.getIn()).thenReturn(message);
         when(message.getBody(String.class)).thenReturn("{uuid\":\"patientUuid\"}");
 
-        assertThrows(RuntimeException.class, () -> bahmniPayloadProcessor.process(exchange));
+        assertThrows(RuntimeException.class, () -> eventProcessor.process(exchange));
     }
 }

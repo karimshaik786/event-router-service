@@ -11,18 +11,18 @@ import org.bahmni.eventrouterservice.configuration.RouteDescriptionLoader.RouteD
 import java.util.LinkedHashMap;
 
 @Slf4j
-class BahmniPayloadProcessor implements Processor {
+class EventProcessor implements Processor {
 
     private final ObjectMapper objectMapper;
     private final RouteDescription routeDescription;
 
-    public BahmniPayloadProcessor(ObjectMapper objectMapper, RouteDescription routeDescription) {
+    public EventProcessor(ObjectMapper objectMapper, RouteDescription routeDescription) {
         this.objectMapper = objectMapper;
         this.routeDescription = routeDescription;
     }
 
     @Override
-    public void process(Exchange exchange) throws Exception {
+    public void process(Exchange exchange) {
         if(routeDescription.getAdditionalProperties().isEmpty()) {
             log.info("Empty additional properties");
             return;
@@ -52,20 +52,4 @@ class BahmniPayloadProcessor implements Processor {
         }
     }
 
-    public enum EventHeaderKey {
-        EVENT_TYPE("eventType"),
-        PAYLOAD_ID("payloadId"),
-        EVENT_ID("eventId"),
-        PUBLISHED_DATE_TIME("publishedDateTime");
-
-        private final String key;
-
-        EventHeaderKey(String key) {
-            this.key = key;
-        }
-
-        public String key() {
-            return key;
-        }
-    }
 }
