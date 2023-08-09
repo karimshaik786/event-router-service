@@ -74,6 +74,28 @@
 			<artifactId>camel-quartz-starter</artifactId>
 		</dependency>
 
+		<!-- Bahmni web client dependency to call -->
+		<dependency>
+			<groupId>org.bahmni.module</groupId>
+			<artifactId>web-clients</artifactId>
+			<version>0.94.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.14</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.7</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
+		</dependency>
+
 		<!-- Camel test dependency -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

@@ -19,19 +19,22 @@ public class BahmniActiveMQToGCPTopicFailedRoute extends RouteBuilder {
     private final RouteDescriptionLoader routeDescriptionLoader;
     private final String googlePubSubProjectId;
     private final ObjectMapper objectMapper;
+    private final BahmniAPIGateway bahmniAPIGateway;
 
     public BahmniActiveMQToGCPTopicFailedRoute(CamelContext context,
                                                RouteDescriptionLoader routeDescriptionLoader,
                                                @Value("${google-pubsub.project-id}") String googlePubSubProjectId,
-                                               ObjectMapper objectMapper) {
+                                               ObjectMapper objectMapper,
+                                               BahmniAPIGateway bahmniAPIGateway) {
         super(context);
         this.routeDescriptionLoader = routeDescriptionLoader;
         this.googlePubSubProjectId = googlePubSubProjectId;
         this.objectMapper = objectMapper;
+        this.bahmniAPIGateway = bahmniAPIGateway;
     }
 
     @Override
-    public void configure() throws Exception {
+    public void configure() {
 
         System.out.println("googlePubSubProjectId : "+googlePubSubProjectId);
 
@@ -41,8 +44,10 @@ public class BahmniActiveMQToGCPTopicFailedRoute extends RouteBuilder {
             cronScheduledRoutePolicy.setRouteStartTime(routeDescription.getErrorDestination().getCronExpressionForRetryStart());
             cronScheduledRoutePolicy.setRouteStopTime(routeDescription.getErrorDestination().getCronExpressionForRetryStop());
 
-            BahmniPayloadFilter bahmniPayloadPropertiesFilterPredicateFor = new BahmniPayloadFilter(objectMapper, routeDescription);
-            BahmniPayloadProcessor bahmniPayloadProcessor = new BahmniPayloadProcessor(objectMapper, routeDescription);
+            EventPropertiesFilter eventPropertiesFilter = new EventPropertiesFilter(objectMapper, routeDescription);
+            PatientPropertiesFilter patientPropertiesFilter = new PatientPropertiesFilter(objectMapper, routeDescription, bahmniAPIGateway);
+            EventProcessor eventProcessor = new EventProcessor(objectMapper, routeDescription);
+            DerivedPropertiesGenerator derivedPropertiesGenerator = new DerivedPropertiesGenerator(routeDescription);
 
             from("activemq:queue:" + routeDescription.getErrorDestination().getQueue().getName())
                 .routePolicy(cronScheduledRoutePolicy)
@@ -52,8 +57,10 @@ public class BahmniActiveMQToGCPTopicFailedRoute extends RouteBuilder {
                     .log(ERROR, "Following exception occurred : ${exception.message} for processing the payload : ${body}")
                 .end()
                 .log(INFO, "Received failed message from ActiveMQ queue : " + routeDescription.getErrorDestination().getQueue().getName())
-                .filter(bahmniPayloadPropertiesFilterPredicateFor)
-                .process(bahmniPayloadProcessor)
+                .filter(eventPropertiesFilter)
+                .process(derivedPropertiesGenerator)
+                .filter(patientPropertiesFilter)
+                .process(eventProcessor)
                 .toD("google-pubsub:"+googlePubSubProjectId+":"+"${headers.destination}")
                 .log("Message sent to Google PubSub on topic : "+"${headers.destination}");
         });
