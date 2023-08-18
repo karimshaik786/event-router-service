@@ -3,6 +3,7 @@ package org.bahmni.eventrouterservice.route;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.component.jms.JmsConfiguration;
 import org.apache.camel.routepolicy.quartz.CronScheduledRoutePolicy;
 import org.bahmni.eventrouterservice.configuration.RouteDescriptionLoader;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,8 +36,6 @@ public class BahmniActiveMQToGCPTopicFailedRoute extends RouteBuilder {
 
     @Override
     public void configure() {
-
-        System.out.println("googlePubSubProjectId : "+googlePubSubProjectId);
 
         routeDescriptionLoader.getRouteDescriptions().forEach(routeDescription -> {
 
