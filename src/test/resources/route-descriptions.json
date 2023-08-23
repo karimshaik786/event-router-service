@@ -13,6 +13,11 @@
         }
       }
     ],
+    "healthCheckDestination": {
+      "topic": {
+        "name": "test-connection"
+      }
+    },
     "errorDestination": {
       "queue": {
         "name": "event-router-service:bahmni-patient-dlq"

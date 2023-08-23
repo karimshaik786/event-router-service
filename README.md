@@ -36,3 +36,4 @@ Explanation:
 - filterBy defines the properties to be filtered out from either the event payload or From patient payload.
   - eventProperties defines the list of properties to be considered for filtering from event payload.
   - patientProperties defines the list of properties to be considered for filtering from patient payload which are getting fetched from Bahmni based on patient uuid.
+- healthCheckDestination is the destination which we can hit to ensure connectivity with destination. Right now using it before start processing failed messages only.

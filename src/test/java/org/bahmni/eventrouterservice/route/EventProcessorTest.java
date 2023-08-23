@@ -64,7 +64,7 @@ class EventProcessorTest {
 
         assertDoesNotThrow(() -> eventProcessor.process(exchange));
 
-        verify(message, times(1)).setHeader("destination", "topicName");
+        verify(exchange, times(1)).setProperty("destination", "topicName");
     }
 
     @Test
