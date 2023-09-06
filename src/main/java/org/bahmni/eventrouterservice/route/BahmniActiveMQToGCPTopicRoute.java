@@ -62,8 +62,8 @@ public class BahmniActiveMQToGCPTopicRoute extends RouteBuilder {
                 .process(derivedPropertiesGenerator)
                 .filter(patientPropertiesFilter)
                 .process(eventProcessor)
-                .toD("google-pubsub:"+googlePubSubProjectId+":"+"${headers.destination}")
-                .log("Message sent to Google PubSub on topic : "+"${headers.destination}");
+                .toD("google-pubsub:"+googlePubSubProjectId+":"+"${exchangeProperty.destination}")
+                .log("Message sent to Google PubSub on topic : "+"${exchangeProperty.destination}");
         });
     }
 }

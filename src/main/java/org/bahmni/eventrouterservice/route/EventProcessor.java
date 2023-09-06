@@ -32,7 +32,7 @@ class EventProcessor implements Processor {
         exchange.getIn().setBody(updatedPayloadAsJson);
 
         String destinationTopic = getDestination(exchange.getIn().getHeader("eventType"));
-        exchange.getIn().setHeader("destination", destinationTopic);
+        exchange.setProperty("destination", destinationTopic);
     }
 
     private String getDestination(Object eventType) {

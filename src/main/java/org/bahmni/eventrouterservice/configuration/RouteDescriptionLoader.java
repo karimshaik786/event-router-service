@@ -60,6 +60,7 @@ public class RouteDescriptionLoader {
         private ErrorDestination errorDestination;
         private LinkedHashMap<String, String> additionalProperties = new LinkedHashMap<>(0);
         private LinkedHashMap<String, String> derivedProperties = new LinkedHashMap<>(0);
+        private Destination healthCheckDestination;
         private FilterBy filterBy;
 
         public Destination getDestinationBasedOn(String eventType) {
