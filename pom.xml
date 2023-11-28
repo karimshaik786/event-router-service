@@ -61,7 +61,7 @@
 		<dependency>
 			<groupId>org.apache.camel.springboot</groupId>
 			<artifactId>camel-activemq-starter</artifactId>
-			 <version>4.2.0</version>
+			 <version>4.1.0</version>
 		</dependency>
 
 		<!-- Camel GCP Pub Sub dependency -->
