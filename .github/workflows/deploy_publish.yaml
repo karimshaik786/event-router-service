@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - Bahmni-IPD-master
-      - activemq-vulnerability-fix
     paths-ignore:
       - "**.md"
   workflow_dispatch:
