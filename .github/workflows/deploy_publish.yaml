@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - Bahmni-IPD-master
+      - test-branch
     paths-ignore:
       - "**.md"
   workflow_dispatch:
