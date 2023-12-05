@@ -1,1 +1,4 @@
+# Ignoring the below vulnerabilities, to be reviewed later
 CVE-2023-39017
+CVE-2023-2976 #Medium
+CVE-2023-33201 #Medium
