@@ -5,12 +5,15 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.bahmni.eventrouterservice.configuration.RouteDescriptionLoader.Destination;
 import org.bahmni.eventrouterservice.configuration.RouteDescriptionLoader.RouteDescription;
+import org.bahmni.eventrouterservice.configuration.RouteDescriptionLoader.AdditionalProperty;
 import org.bahmni.eventrouterservice.model.Topic;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.ArrayList;
 
 import static org.bahmni.eventrouterservice.configuration.RouteDescriptionLoader.BahmniEventType.BAHMNI_PATIENT_UPDATED;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -25,13 +28,16 @@ class EventProcessorTest {
 
         RouteDescription routeDescription = mock(RouteDescription.class);
         Destination destination = new Destination(BAHMNI_PATIENT_UPDATED, new Topic("topicName", null), null);
-        LinkedHashMap<String, String> additionalProperties = new LinkedHashMap<>();
-        additionalProperties.put("facility", "Ethopia");
+        LinkedHashMap<String, String> staticProperties = new LinkedHashMap<>();
+        staticProperties.put("facility", "Bahmni");
+        AdditionalProperty additionalProperty = new AdditionalProperty("$", null, null, staticProperties, null);
+        List<AdditionalProperty> additionalProperties = new ArrayList();
+        additionalProperties.add(additionalProperty);
         when(routeDescription.getAdditionalProperties()).thenReturn(additionalProperties);
         when(routeDescription.getDestinationBasedOn("BAHMNI_PATIENT_UPDATED")).thenReturn(destination);
 
 
-        EventProcessor eventProcessor = new EventProcessor(new ObjectMapper(), routeDescription);
+        EventProcessor eventProcessor = new EventProcessor(routeDescription);
 
         Exchange exchange = mock(Exchange.class);
         Message message = mock(Message.class);
@@ -41,7 +47,7 @@ class EventProcessorTest {
 
         assertDoesNotThrow(() -> eventProcessor.process(exchange));
 
-        verify(message, times(1)).setBody("{\"uuid\":\"patientUuid\",\"facility\":\"Ethopia\"}");
+        verify(message, times(1)).setBody("{\"uuid\":\"patientUuid\",\"facility\":\"Bahmni\"}");
     }
 
     @Test
@@ -49,12 +55,15 @@ class EventProcessorTest {
 
         RouteDescription routeDescription = mock(RouteDescription.class);
         Destination destination = new Destination(BAHMNI_PATIENT_UPDATED, new Topic("topicName", null), null);
-        LinkedHashMap<String, String> additionalProperties = new LinkedHashMap<>();
-        additionalProperties.put("facility", "Ethopia");
+        LinkedHashMap<String, String> staticProperties = new LinkedHashMap<>();
+        staticProperties.put("facility", "Bahmni");
+        AdditionalProperty additionalProperty = new AdditionalProperty("$", null, null, staticProperties, null);
+        List<AdditionalProperty> additionalProperties = new ArrayList();
+        additionalProperties.add(additionalProperty);
         when(routeDescription.getAdditionalProperties()).thenReturn(additionalProperties);
         when(routeDescription.getDestinationBasedOn("BAHMNI_PATIENT_UPDATED")).thenReturn(destination);
 
-        EventProcessor eventProcessor = new EventProcessor(new ObjectMapper(), routeDescription);
+        EventProcessor eventProcessor = new EventProcessor(routeDescription);
 
         Exchange exchange = mock(Exchange.class);
         Message message = mock(Message.class);
@@ -71,10 +80,9 @@ class EventProcessorTest {
     public void givenAdditionalPropertiesAreEmpty_whenStartProcessing_thenShouldNotAddInPayload() {
 
         RouteDescription routeDescription = mock(RouteDescription.class);
-        LinkedHashMap<String, String> additionalProperties = new LinkedHashMap<>();
-        when(routeDescription.getAdditionalProperties()).thenReturn(additionalProperties);
+        when(routeDescription.getAdditionalProperties()).thenReturn(new ArrayList());
 
-        EventProcessor eventProcessor = new EventProcessor(new ObjectMapper(), routeDescription);
+        EventProcessor eventProcessor = new EventProcessor(routeDescription);
 
         Exchange exchange = mock(Exchange.class);
 
@@ -87,11 +95,14 @@ class EventProcessorTest {
     public void givenAdditionalPropertyKeyWithValueWithInvalidPayload_whenStartProcessing_thenShouldThrowRuntimeException() {
 
         RouteDescription routeDescription = mock(RouteDescription.class);
-        LinkedHashMap<String, String> additionalProperties = new LinkedHashMap<>();
-        additionalProperties.put("facility", "Ethopia");
+        LinkedHashMap<String, String> staticProperties = new LinkedHashMap<>();
+        staticProperties.put("facility", "Bahmni");
+        AdditionalProperty additionalProperty = new AdditionalProperty("$", null, null, staticProperties, null);
+        List<AdditionalProperty> additionalProperties = new ArrayList();
+        additionalProperties.add(additionalProperty);
         when(routeDescription.getAdditionalProperties()).thenReturn(additionalProperties);
 
-        EventProcessor eventProcessor = new EventProcessor(new ObjectMapper(), routeDescription);
+        EventProcessor eventProcessor = new EventProcessor(routeDescription);
 
         Exchange exchange = mock(Exchange.class);
         Message message = mock(Message.class);
