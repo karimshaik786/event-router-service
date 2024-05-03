@@ -47,7 +47,7 @@ public class BahmniActiveMQToGCPTopicFailedRoute extends RouteBuilder {
 
             EventPropertiesFilter eventPropertiesFilter = new EventPropertiesFilter(objectMapper, routeDescription);
             PatientPropertiesFilter patientPropertiesFilter = new PatientPropertiesFilter(objectMapper, routeDescription, bahmniAPIGateway);
-            EventProcessor eventProcessor = new EventProcessor(objectMapper, routeDescription);
+            EventProcessor eventProcessor = new EventProcessor(routeDescription);
             DerivedPropertiesGenerator derivedPropertiesGenerator = new DerivedPropertiesGenerator(routeDescription);
 
             String sourceTopic = routeDescription.getErrorDestination().getQueue().getName();

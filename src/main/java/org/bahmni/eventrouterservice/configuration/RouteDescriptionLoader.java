@@ -58,7 +58,7 @@ public class RouteDescriptionLoader {
         private Source source;
         private List<Destination> destinations;
         private ErrorDestination errorDestination;
-        private LinkedHashMap<String, String> additionalProperties = new LinkedHashMap<>(0);
+        private List<AdditionalProperty> additionalProperties;
         private LinkedHashMap<String, String> derivedProperties = new LinkedHashMap<>(0);
         private Destination healthCheckDestination;
         private FilterBy filterBy;
@@ -113,6 +113,19 @@ public class RouteDescriptionLoader {
         private Long retryDeliveryDelayInMills;
         private String cronExpressionForRetryStart;
         private String cronExpressionForRetryStop;
+    }
+
+    @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class AdditionalProperty {
+        private String parentPath;
+        private String filterKeyPath;
+        private String filterValue;
+        private LinkedHashMap<String, String> staticProperties = new LinkedHashMap<>(0);
+        private LinkedHashMap<String, String> dynamicProperties = new LinkedHashMap<>(0);
     }
 
     public enum BahmniEventType {

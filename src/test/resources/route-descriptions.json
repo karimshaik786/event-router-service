@@ -27,9 +27,12 @@
       "cronExpressionForRetryStart": "* 5 * * * ?",
       "cronExpressionForRetryStop": "* 7 * * * ?"
     },
-    "additionalProperties": {
-      "facility": "Ethopia"
-    },
+    "additionalProperties": [{
+      "parentPath": "$",
+      "staticProperties": {
+        "facility": "Bahmni"
+      }
+    }],
     "derivedProperties": {
       "patientUuid": "$.patient.uuid"
     },
