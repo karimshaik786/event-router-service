@@ -126,6 +126,17 @@ public class RouteDescriptionLoader {
         private String filterValue;
         private LinkedHashMap<String, String> staticProperties = new LinkedHashMap<>(0);
         private LinkedHashMap<String, String> dynamicProperties = new LinkedHashMap<>(0);
+        private LinkedHashMap<String, SplitPatternConfiguration> splitPatternConfigurations = new LinkedHashMap<>(0);
+    }
+
+    @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SplitPatternConfiguration {
+        private String splitPattern;
+        private Integer splitIndex;
     }
 
     public enum BahmniEventType {

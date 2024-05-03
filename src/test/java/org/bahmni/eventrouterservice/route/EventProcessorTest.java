@@ -30,7 +30,7 @@ class EventProcessorTest {
         Destination destination = new Destination(BAHMNI_PATIENT_UPDATED, new Topic("topicName", null), null);
         LinkedHashMap<String, String> staticProperties = new LinkedHashMap<>();
         staticProperties.put("facility", "Bahmni");
-        AdditionalProperty additionalProperty = new AdditionalProperty("$", null, null, staticProperties, null);
+        AdditionalProperty additionalProperty = new AdditionalProperty("$", null, null, staticProperties, null, null);
         List<AdditionalProperty> additionalProperties = new ArrayList();
         additionalProperties.add(additionalProperty);
         when(routeDescription.getAdditionalProperties()).thenReturn(additionalProperties);
@@ -57,7 +57,7 @@ class EventProcessorTest {
         Destination destination = new Destination(BAHMNI_PATIENT_UPDATED, new Topic("topicName", null), null);
         LinkedHashMap<String, String> staticProperties = new LinkedHashMap<>();
         staticProperties.put("facility", "Bahmni");
-        AdditionalProperty additionalProperty = new AdditionalProperty("$", null, null, staticProperties, null);
+        AdditionalProperty additionalProperty = new AdditionalProperty("$", null, null, staticProperties, null, null);
         List<AdditionalProperty> additionalProperties = new ArrayList();
         additionalProperties.add(additionalProperty);
         when(routeDescription.getAdditionalProperties()).thenReturn(additionalProperties);
@@ -97,7 +97,7 @@ class EventProcessorTest {
         RouteDescription routeDescription = mock(RouteDescription.class);
         LinkedHashMap<String, String> staticProperties = new LinkedHashMap<>();
         staticProperties.put("facility", "Bahmni");
-        AdditionalProperty additionalProperty = new AdditionalProperty("$", null, null, staticProperties, null);
+        AdditionalProperty additionalProperty = new AdditionalProperty("$", null, null, staticProperties, null, null);
         List<AdditionalProperty> additionalProperties = new ArrayList();
         additionalProperties.add(additionalProperty);
         when(routeDescription.getAdditionalProperties()).thenReturn(additionalProperties);
