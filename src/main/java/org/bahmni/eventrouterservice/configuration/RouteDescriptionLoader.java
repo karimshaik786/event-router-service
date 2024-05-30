@@ -123,20 +123,10 @@ public class RouteDescriptionLoader {
     public static class AdditionalProperty {
         private String parentPath;
         private String filterKeyPath;
-        private List<AdditionalPropertyFilter> additionalPropertyFilters;
+        private String filterValue;
         private LinkedHashMap<String, String> staticProperties = new LinkedHashMap<>(0);
         private LinkedHashMap<String, String> dynamicProperties = new LinkedHashMap<>(0);
         private LinkedHashMap<String, SplitPatternConfiguration> splitPatternConfigurations = new LinkedHashMap<>(0);
-    }
-
-    @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class AdditionalPropertyFilter {
-        private String keyPath;
-        private String value;
     }
 
     @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
