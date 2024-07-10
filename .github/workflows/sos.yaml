@@ -1,0 +1,34 @@
+name: Manage GCP Instances Manually
+
+on:
+  push:
+    branches:
+      - Bahmni-IPD-master
+  workflow_dispatch:
+    inputs:
+      instance_name:
+        description: 'Select the GCP instance to start'
+        required: true
+        type: choice
+        options:
+          - cure-emr-test-gcp
+          - cure-emr-test-gcp
+          - cure-emr-test-gcp
+        default: cure-emr-test-gcp
+
+jobs:
+  manage-instances:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Google Cloud SDK
+        id: 'auth'
+        uses: 'google-github-actions/auth@v2'
+        with:
+            credentials_json: ${{ secrets.CURE_EMR_DEPLOYMENTS_SERVICE_ACCOUNT_KEY }}
+
+      - name: Start GCP instances
+        run: |
+            gcloud compute instances stop ${{ github.event.inputs.instance_name }} --zone us-east1-b
